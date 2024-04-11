@@ -501,8 +501,8 @@ class Exp(BaseExp):
 
     def get_trainer(self, args,val=False):
         __package__="NN_Train_test.Experiments.yolo_base"
-        from ..Trainer.Trainer import Trainer
-        trainer = Trainer(self, args,val=val)
+        from ..Evaluator.Evaluator import Evaluator
+        trainer = Evaluator(self, args,val=val)
         # NOTE: trainer shouldn't be an attribute of exp object
         return trainer
 

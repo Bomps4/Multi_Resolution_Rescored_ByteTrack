@@ -1,0 +1,11 @@
+./Testing_library/Models/__pycache__
+./Testing_library/Trainer/__pycache__
+./Testing_library/Models/Layers/__pycache__
+./Testing_library/Models/Heads/__pycache__
+./Testing_library/utils/__pycache__
+./Testing_library/Models/Backbones/__pycache__
+./Testing_library/Models/Postprocess/__pycache__
+./Testing_library/Experiments/__pycache__
+./Testing_library/My_transforms/__pycache__
+./Testing_library/Dataset/__pycache__
+./Testing_library/Evaluator_outputs/*
