@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # Copyright (c) Megvii Inc. All rights reserved.
+# modified by Bomps4 (luca.bompani5@unibo.it) University of Bologna
 
 import torch.nn as nn
 import torch
