@@ -1,3 +1,5 @@
+#Copyright (C)  Bomps4 (luca.bompani5@unibo.it) 2023-2024 University of Bologna, Italy.
+
 import xml.etree.ElementTree as ET
 import os
 from detectron2.structures import BoxMode
