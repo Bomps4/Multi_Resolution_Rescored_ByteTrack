@@ -1,3 +1,5 @@
+#   Copyright (C) Bomps4 (luca.bompani5@unibo.it)  2023-2024 University of Bologna, Italy.
+
 from loguru import logger
 import torch
 from torch import nn
