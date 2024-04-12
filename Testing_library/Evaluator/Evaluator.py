@@ -1,4 +1,4 @@
-
+# Copyright (c) Megvii, Inc. and its affiliates.
 import datetime
 import os
 import time
