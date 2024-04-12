@@ -1,4 +1,4 @@
-#Copyright (c) 2021-2022 Megvii Inc. All rights reserved.
+# Copyright (c) 2021-2022 Megvii Inc. and its affiliates. 
 # modified by Bomps4 (luca.bompani5@unibo.it)  Copyright (C) 2023-2024 University of Bologna, Italy.
 
 import torch
