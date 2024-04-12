@@ -1,3 +1,6 @@
+# Copyright (c) Megvii, Inc. and its affiliates.
+# modified by Luca Bompani
+
 import torch
 import torch.nn as nn
 from typing import Union
