@@ -1,3 +1,5 @@
+# modified by Bomps4 (luca.bompani5@unibo.it)  Copyright (C) 2023-2024 University of Bologna, Italy.
+
 from .yolox_s_multisize import Exp as My_Exp
 from ..Dataset.Imagenet import data_dict 
 import os 
