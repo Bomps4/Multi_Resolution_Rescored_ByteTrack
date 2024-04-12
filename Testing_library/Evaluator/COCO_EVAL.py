@@ -78,10 +78,8 @@ class COCO_EVAL(object):
         cocoEval.accumulate()
         
         cocoEval.summarize()
-        # precision=cocoEval.eval['absolute_precision']
-        # recall=cocoEval.eval['recall']
+        
         A_P=[f" \n Average Precision  (AP) @[ IoU={j} | area=   {k} | maxDets=100 ] = {i} \n" for j,k,i in zip(['0.5:0.95','0.5','0.75','0.5:0.95','0.5:0.95','0.5:0.95'],['all','all','all','small','medium','large'],cocoEval.stats[:6])]
         A_R=[f" \n Average Recall     (AR) @[ IoU={j} | area=   {k} | maxDets=  1 ] = {i} \n" for j,k,i in zip(['0.5:0.95','0.5','0.75','0.5:0.95','0.5:0.95','0.5:0.95'],['all','all','all','small','medium','large'],cocoEval.stats[6:])]
-        # out_pre = [f"output precision {np.mean(precision[0,:,0,2])}"]
-        # out_recall=[f"output recall {np.mean(recall[0,:,0,2])}"]
-        return A_P+A_R+out_pre+out_recall
+      
+        return A_P+A_R

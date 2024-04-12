@@ -110,19 +110,18 @@ class Exp(BaseExp):
         self.base_value=114 #used to fill the empty part of an image in resize
         # activation name. For example, if using "relu", then "silu" will be replaced to "relu".
         self.act = "silu"
+        #mean and standard deviation for images
         self.mean = torch.tensor([0.485 * 255, 0.456 * 255, 0.406 * 255])
         self.std = torch.tensor([0.229 * 255, 0.224 * 255, 0.225 * 255])
-        self.normalize=True
-        self.class_agnostic=False
-        self.bgr=True
+        self.normalize=True #if to normalize the images pixels or leave it in the 0 255 range
+        self.class_agnostic=False #define the type of nms applied 
+        self.bgr=True  #define if images are read in the bgr format or rgb if false
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
         # If your training process cost many memory, reduce this value.
         self.data_num_workers = 4
         self.input_size = (320,240)  # (height, width)
         # Actual multiscale ranges: [640 - 5 * 32, 640 + 5 * 32].
-        # To disable multiscale training, set the value to 0.
-        self.multiscale_range = 5
         # You can uncomment this line to specify a multiscale range
         # self.random_size = (14, 26)
         # dir of dataset images, if data_dir is None, this project will use `datasets` dir
@@ -155,66 +154,30 @@ class Exp(BaseExp):
         # shear angle range, for example, if set to 2, the true range is (-2, 2)
         self.shear = 2.0
         '''
-
-        # --------------  training config --------------------- #
-        # epoch number used for warmup
-        self.warmup_epochs = 3
-        # max training epoch
-        self.max_epoch = 20
-        # minimum learning rate during warmup
-        self.warmup_lr = 0.005
-        
-        # learning rate for one image. During training, lr will multiply batchsize.
-        self.basic_lr_per_img = 0.01 / 64 
-        # name of LRScheduler
-        
-        # last #epoch to close augmention like mosaic
-        self.no_aug_epochs = 5
-        # apply EMA during training
-        self.ema = True
-
-        # weight decay of optimizer
-        self.weight_decay = 4e-5
-        # momentum of optimizer
-        self.momentum = 0.9
-        # log period in iter, for example,
-        # if set to 1, user could see log every iteration.
-        self.print_interval = 100
-        # eval period in epoch, for example,
-        # if set to 1, model will be evaluate after every epoch.
-        self.eval_interval = 3
-        # save history checkpoint or not.
-        # If set to False, yolox will only save latest and best ckpt.
-        self.save_history_ckpt = True
-        # name of experiment
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         #use resizing of pytorch o PIL
         self.resize_as_tensor=True
         # -----------------  testing config ------------------ #
         # output image size during evaluation/test
         self.test_size = (576, 576)
+        # image size for the reduced boxes
+        self.reduced_size = (256,256)
         # confidence threshold during evaluation/test,
         # boxes whose scores are less than test_conf will be filtered
         self.test_conf = 0.003
         # nms threshold
         self.nmsthre = 0.65
-        #zero value for resize
-        self.base_value=114
         #INDICATES COCO RESTRICTION TO BE USED (IF Imgvid no restriction else COCO_V1 XOr COCO_V2 )
         self.COCO='Imgvid'
+        #swapping to be applied in change of 
         self.swap=(2, 1, 0)
         #consider a background class 
         self.Add_Background=False
+        self.resize_frequency=5 #number of frames before a frame is not resized (TODO change name)
+        self.seq_lenght=1
         #use a pretrained in the model
         self.pretrained=True
-        self.reduced_size = (256,256)
-        self.resize_frequency=5 #number of frames before a frame is not resized(need to change name)
-        self.seq_lenght=1
-        self.pretrained_file = '/home/bompani/CNN_Training/Training_experiements/NN_Train_test/Models/Pretrained/yolox_nano.pth'
-        self.mosaic_augment=True
-        self.nntool_val_ann_dir = '/home/bompani/CNN_Training/mini_dataset/Annotations/'
-        self.nntool_val_dat_dir = '/home/bompani/CNN_Training/mini_dataset/Data/'
-
+        
 
     def get_model(self):
         from ..Models.Heads.yolo_head import   YOLOXHead
@@ -350,46 +313,6 @@ class Exp(BaseExp):
             return [T_Resize_as_YOLO(self.test_size,base_value=self.base_value,swap=self.swap,bgr=self.bgr),T_To_tensor(self.normalize,self.mean,self.std)]
 
 
-    def get_optimizer(self, batch_size):
-        if "optimizer" not in self.__dict__:
-            if self.warmup_epochs > 0:
-                lr = self.warmup_lr
-            else:
-                lr = self.basic_lr_per_img * batch_size
-
-            pg0, pg1, pg2 = [], [], []  # optimizer parameter groups
-
-            for k, v in self.model.named_modules():
-                if hasattr(v, "bias") and isinstance(v.bias, nn.Parameter):
-                    pg2.append(v.bias)  # biases
-                if isinstance(v, nn.BatchNorm2d) or "bn" in k:
-                    pg0.append(v.weight)  # no decay
-                elif hasattr(v, "weight") and isinstance(v.weight, nn.Parameter):
-                    pg1.append(v.weight)  # apply decay
-
-            optimizer = torch.optim.SGD(
-                pg0, lr=lr, momentum=self.momentum, nesterov=True
-            )
-            optimizer.add_param_group(
-                {"params": pg1, "weight_decay": self.weight_decay}
-            )  # add pg1 with weight_decay
-            optimizer.add_param_group({"params": pg2,"weight_decay": self.weight_decay})
-            self.optimizer = optimizer
-
-        return self.optimizer
-
-    def get_lr_scheduler(self,batch_size):
-        from ..Schedulers.Warmup_cosine import Linear_Warmup_Cosine_Schedule 
-        if('lr_scheduler' in self.__dict__):
-            return self.lr_scheduler
-        if("optimizer" not in self.__dict__):
-            logger.error("you cannot instancuiate the learning rate scheduler without having the optimizer execution will stop")
-            raise Exception("Tried to create lr-scheduler without first instanciating the optimizer")
-        if(self.warmup_epochs!=0):
-            self.lr_scheduler = Linear_Warmup_Cosine_Schedule(self.optimizer,self.warmup_epochs,self.basic_lr_per_img * batch_size,self.max_epoch+1)
-        else:
-            self.lr_scheduler =torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.max_epoch+1)
-        return self.lr_scheduler
     
     def _get_resize_multires(self):
         from ..My_transforms.Transforms import T_Resize_Multires

@@ -86,12 +86,9 @@ class Evaluator:
             )
 
 
-        if val and self.exp.multisize:
+        if val :
             self.evaluate_multires()
             return 
-        if val:
-            self.evaluate()
-            return
         
 
    
