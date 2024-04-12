@@ -1,3 +1,5 @@
+#Copyright (c) 2021-2022 Megvii Inc. All rights reserved.
+
 import argparse
 def set_parser_option(parser):
     
