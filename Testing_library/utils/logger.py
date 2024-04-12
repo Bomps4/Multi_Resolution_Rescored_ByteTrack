@@ -1,3 +1,5 @@
+# Copyright (c) 2021-2022 Megvii Inc. and its affiliates. 
+
 from loguru import logger
 import os 
 import datetime 
