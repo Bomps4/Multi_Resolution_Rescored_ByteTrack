@@ -1,3 +1,5 @@
+# modified by Bomps4 (luca.bompani5@unibo.it)  Copyright (C) 2023-2024 University of Bologna, Italy.
+
 from torch import nn
 import torch
 from typing import *
