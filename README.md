@@ -1,7 +1,7 @@
 #     Multi_Resolution_Rescored_ByteTrack
 
-The code in this repository is based on the code from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX),[YOLOV](https://github.com/YuHengsss/YOLOV/tree/master)and [ByteTrack](https://github.com/ifzhang/ByteTrack)
-We are happy to announce that our paper [Multi-resolution Rescored ByteTrack for Video Object Detection on Ultra-low-power Embedded Systems]() has been accepted at the Embedded Vision Workshop at the CVPR conference.
+The code in this repository is based on the code from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX),[YOLOV](https://github.com/YuHengsss/YOLOV/tree/master)and [ByteTrack](https://github.com/ifzhang/ByteTrack).\\
+We are happy to announce that our paper [Multi-resolution Rescored ByteTrack for Video Object Detection on Ultra-low-power Embedded Systems]() has been accepted at the Embedded Vision Workshop at the CVPR conference.\\
 In this repo the code to reproduce our results with MR2ByteTrack on the YOLOXS network. To do so you will need to:
 
 ![How MR2ByteTrack works](./images/MR2_ByteTrack.png)
