@@ -1,3 +1,5 @@
+# modified by Bomps4 (luca.bompani5@unibo.it)  Copyright (C) 2023-2024 University of Bologna, Italy.
+
 from .functional import *
 from .functional import _affine_bounding_box_xyxy
 from torchvision.transforms import RandomHorizontalFlip,RandomVerticalFlip,RandomRotation,Resize
