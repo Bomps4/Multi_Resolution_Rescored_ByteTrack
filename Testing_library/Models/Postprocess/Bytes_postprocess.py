@@ -1,3 +1,6 @@
+# Copyright (c) Yifu Zhang under MIT License
+# modified by Bomps4 (luca.bompani5@unibo.it)  Copyright (C) 2023-2024 University of Bologna, Italy.
+
 import numpy as np 
 import cv2
 from .similaritymetrics import iou_batch
