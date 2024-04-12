@@ -17,6 +17,6 @@ In this repo the code to reproduce our results with MR2ByteTrack on the YOLOXS n
     - change ``` self.val_ann_dir``` with the path to the Annotation VID folder contained in the ILSVRC2015 VID dataset folder
 to reproduce the experiment with MR2-ByteTrack and the YOLOXS network run the command:\
     ```shell
-     python eval_multires.py -f=./BYTE_RESCORE/Experiments/BYTE_YOLOXS_multisize.py --b=1 -d=1 -c=path/to/the/yoloxs/weights
+     python eval_multires.py -f=./BYTE_RESCORE/Experiments/BYTE_YOLOXS_multisize.py -c=path/to/the/yoloxs/weights
     ```
     the -f option indicates the experiment that you are running and -c is used for loading pretrained weights from checkpoint. For an explanation of all the parameters see the file yolo_base_multisize.py.
