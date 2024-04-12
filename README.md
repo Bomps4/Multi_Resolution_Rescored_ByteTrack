@@ -16,6 +16,8 @@ In this repo the code to reproduce our results with MR2ByteTrack on the YOLOXS n
     - change ``` self.val_dat_dir``` with the path to the Data VID folder contained in the ILSVRC2015 VID dataset folder
     - change ``` self.val_ann_dir``` with the path to the Annotation VID folder contained in the ILSVRC2015 VID dataset folder
 to run the experiment use :
+
+indicare i parametri cosa fanno dove sono e che esperimento riproducono.
     ```shell
      python -f=./BYTE_RESCORE/Experiments/BYTE_YOLOXS_multisize.py --b=1 -d=1 -c=path/to/the/yoloxs/weights
     ```
