@@ -48,16 +48,10 @@ class StreamToLogger:
 class Evaluator:
     def __init__(self, exp, args, val=False):
         # init function only defines some basic attr, other attrs like model, optimizer are built in
-        # before_train methods.
+        
         self.exp = exp
         self.args = args
-        #self.prefetcher = vid.DataPrefetcher(train_loader)
-        #self.train_loader = train_loader
         
-        # training related attr
-        self.max_epoch = exp.max_epoch
-        self.amp_training = args.fp16
-        self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
         self.is_distributed = get_world_size() > 1
         self.rank = get_rank()
         self.val_loader = self.exp.get_eval_loader(self.args.batch_size,self.is_distributed)
@@ -67,13 +61,12 @@ class Evaluator:
         # data/dataloader related attr
         self.data_type = torch.float16 if args.fp16 else torch.float32
         self.input_size = exp.input_size
-        self.best_ap = 0
         
 
         # metric record
         self.meter = MeterBuffer(window_size=exp.print_interval)
         self.saving_dir=exp.saving_dir
-        # evaluator 
+        
        
         
         
@@ -110,7 +103,7 @@ class Evaluator:
         COCO_labels=torch.tensor([data_dict[self.exp.COCO][i] - int(not self.exp.Add_Background)  for i in data_dict[self.exp.COCO]])
         self.coco_eval=COCO_EVAL(classes=DATASET_NAMES[self.exp.COCO][1:],ids=COCO_labels,saving_directory=self.saving_dir,add_background=self.exp.Add_Background)
         
-        tide = TIDE()
+        tide = TIDE() 
         gt_data = Data('gt_data')
         det_data= Data('det_data')
        
@@ -244,16 +237,14 @@ class Evaluator:
                         outputs = [i for i,ids in zip(outputs,current_ids) if (ids not in older_ids) ]
                         originals['image_id']=[i for i in current_ids if (i not in older_ids)]
 
-                        # print(f"sono image ids {originals['image_id']}")
-                    
+                        
                         if(len(current_input)==self.exp.num_frames):
                                 older_input=copy.deepcopy(current_input)
                                 older_ids=copy.deepcopy(current_ids)
 
                                                
                     outputs_list=[self.model.out_to_detectron(i,(width,height)) for i,width,height in zip(outputs,originals["width"],originals["height"])]
-                    # print(f'final outputs lists{outputs_list}')
-                    # input()
+                    
                     
                     for detect,ids in zip(outputs_list,originals['image_id']):
                         

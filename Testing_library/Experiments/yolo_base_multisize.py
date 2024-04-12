@@ -39,26 +39,6 @@ class BaseExp(metaclass=SingletonABCMeta):
     def get_model(self) -> Module:
         pass
 
-    @abstractmethod
-    def get_train_loader(
-        self, batch_size: int, is_distributed: bool
-    ) -> Dict[str, torch.utils.data.DataLoader]:
-        pass
-
-    @abstractmethod
-    def get_optimizer(self, batch_size: int) -> torch.optim.Optimizer:
-        pass
-
-    @abstractmethod
-    def get_lr_scheduler(
-        self, lr: float, iters_per_epoch: int, **kwargs
-    ) -> Type[torch.optim.lr_scheduler._LRScheduler]:
-        pass
-
-    @abstractmethod
-    def get_evaluator(self):
-        pass
-
 
     def merge(self, cfg_list):
         assert len(cfg_list) % 2 == 0
@@ -110,58 +90,31 @@ class Exp(BaseExp):
         self.base_value=114 #used to fill the empty part of an image in resize
         # activation name. For example, if using "relu", then "silu" will be replaced to "relu".
         self.act = "silu"
+        #experiment name
+        self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
+        # ---------------- dataloader config ---------------- #
+        # set worker to 4 for shorter dataloader init time
+        # If your training process cost  a lot of memory, reduce this value.
+        self.data_num_workers = 4
+        # name of annotation file for evaluation
+        self.val_dat_dir = "/path/to/ILSVRC2015/Data/VID/"
+        # name of annotation file for testing
+        self.val_ann_dir= "/path/to/Annotations/VID/"
+        #define if images are read in the bgr format or rgb if false
+        self.bgr=True   
+        # full resolution output image size during evaluation/test
+        self.test_size = (576, 576)
+        # low resolution image size for the reduced boxes
+        self.reduced_size = (256,256)
+        
+        # -----------------  testing config ------------------ #
+        #use resizing of pytorch o PIL
+        self.resize_as_tensor=True
         #mean and standard deviation for images
         self.mean = torch.tensor([0.485 * 255, 0.456 * 255, 0.406 * 255])
         self.std = torch.tensor([0.229 * 255, 0.224 * 255, 0.225 * 255])
         self.normalize=True #if to normalize the images pixels or leave it in the 0 255 range
         self.class_agnostic=False #define the type of nms applied 
-        self.bgr=True  #define if images are read in the bgr format or rgb if false
-        # ---------------- dataloader config ---------------- #
-        # set worker to 4 for shorter dataloader init time
-        # If your training process cost many memory, reduce this value.
-        self.data_num_workers = 4
-        self.input_size = (320,240)  # (height, width)
-        # Actual multiscale ranges: [640 - 5 * 32, 640 + 5 * 32].
-        # You can uncomment this line to specify a multiscale range
-        # self.random_size = (14, 26)
-        # dir of dataset images, if data_dir is None, this project will use `datasets` dir
-        self.data_dir = "/scratch/ILSVRC2015/Data/VID/train/"
-        # name of annotation file for training
-        self.train_ann_dir = "/scratch/ILSVRC2015/Annotations/VID/train/"
-        # name of annotation file for evaluation
-        self.val_dat_dir = "/scratch/ILSVRC2015/Data/VID/"
-        # name of annotation file for testing
-        self.val_ann_dir= "/scratch/ILSVRC2015/Annotations/VID/"
-
-        # --------------- transform config ----------------- #
-        ''' currently ignored
-        # prob of applying mosaic aug
-        self.mosaic_prob = 1.0
-        # prob of applying mixup aug
-        self.mixup_prob = 1.0
-        # prob of applying hsv aug
-        self.hsv_prob = 1.0
-        # prob of applying flip aug
-        self.flip_prob = 0.5
-        # rotation angle range, for example, if set to 2, the true range is (-2, 2)
-        self.degrees = 10.0
-        # translate range, for example, if set to 0.1, the true range is (-0.1, 0.1)
-        self.translate = 0.1
-        self.mosaic_scale = (0.1, 2)
-        # apply mixup aug or not
-        self.enable_mixup = True
-        self.mixup_scale = (0.5, 1.5)
-        # shear angle range, for example, if set to 2, the true range is (-2, 2)
-        self.shear = 2.0
-        '''
-        self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
-        #use resizing of pytorch o PIL
-        self.resize_as_tensor=True
-        # -----------------  testing config ------------------ #
-        # output image size during evaluation/test
-        self.test_size = (576, 576)
-        # image size for the reduced boxes
-        self.reduced_size = (256,256)
         # confidence threshold during evaluation/test,
         # boxes whose scores are less than test_conf will be filtered
         self.test_conf = 0.003
@@ -169,14 +122,12 @@ class Exp(BaseExp):
         self.nmsthre = 0.65
         #INDICATES COCO RESTRICTION TO BE USED (IF Imgvid no restriction else COCO_V1 XOr COCO_V2 )
         self.COCO='Imgvid'
-        #swapping to be applied in change of 
+        #swapping to be applied to have CHW format
         self.swap=(2, 1, 0)
         #consider a background class 
         self.Add_Background=False
         self.resize_frequency=5 #number of frames before a frame is not resized (TODO change name)
         self.seq_lenght=1
-        #use a pretrained in the model
-        self.pretrained=True
         
 
     def get_model(self):
@@ -201,64 +152,6 @@ class Exp(BaseExp):
         self.model.train()
         return self.model
     
-    def get_train_augmentations(self):
-        from ..Dataset.Imagenet import Mosaic_Augment
-        if('augmentations' in self.__dict__):
-            return self.augmentations
-        self.augmentations=[Mosaic_Augment(self.dataset.data,self.input_size,(0.3,0.7))]
-        return self.augmentations
-        
-    def get_train_transformations(self):
-        from ..My_transforms.Transforms import T_RandomPhotometricDistort,T_RandomVerticalFlip,T_RandomHorizontalFlip,T_RandomIoUCrop
-        if('transformations' in self.__dict__):
-            return self.transformations
-        self.transformations=[T_RandomIoUCrop(),T_RandomVerticalFlip(p=0.3),T_RandomHorizontalFlip(p=0.3),T_RandomPhotometricDistort(p=0.3)]
-        return self.transformations
-
-    def get_train_loader(self, batch_size, is_distributed, transforms=[], cache_img=False):
-        from ..Dataset.Imagenet import Imagenet_VID_Dataset,Mosaic_Augment
-        from torch.utils.data import DataLoader
-        print(len(transforms))
-        transforms=transforms+self._get_resizer_normalization()
-        if(not hasattr(self,'dataset')):    
-            self.dataset = Imagenet_VID_Dataset(self.train_ann_dir,self.data_dir,transform=transforms,COCO=self.COCO,Add_Background=self.Add_Background)
-        if self.mosaic_augment:
-            self.dataset.add_transform(Mosaic_Augment(self.dataset.data,self.input_size,(0.3,1)))
-        
-        
-        '''
-        def collate(seq_of_seq):
-            images=[ i[0].unsqueeze(0) for i in seq_of_seq ]
-            labels=[ j for i in seq_of_seq  for j in i[1]]
-            return images,labels
-        
-
-        sampler = InfiniteSampler(len(self.dataset), seed=self.seed if self.seed else 0)
-
-        batch_sampler = YoloBatchSampler(
-            sampler=sampler,
-            batch_size=batch_size,
-            drop_last=False,
-            mosaic=not no_aug,
-        )
-        '''
-        dataloader_kwargs = {"num_workers": self.data_num_workers, "pin_memory": True,"shuffle":True}
-        if is_distributed:
-            batch_size = batch_size // dist.get_world_size() 
-            
-            dataloader_kwargs["sampler"] = torch.utils.data.distributed.DistributedSampler(
-                self.dataset, shuffle=False
-            )
-
-        # Make sure each process has different random seed, especially for 'fork' method.
-        # Check https://github.com/pytorch/pytorch/issues/63311 for more details.
-        dataloader_kwargs["worker_init_fn"] = worker_init_reset_seed
-        dataloader_kwargs["batch_size"] = batch_size
-        dataloader_kwargs["timeout"] = 100 # maximum number of seconds allowed to recover a batch
-
-        train_loader = DataLoader(self.dataset,**dataloader_kwargs)
-
-        return train_loader,int(ceil(len(self.dataset)/batch_size))
     
     def get_boxes_resizer(self):
         from ..My_transforms.functional import resize_bounding_box
@@ -350,78 +243,6 @@ class Exp(BaseExp):
 
         return self.val_loader
     
-    def get_nntool_eval_loader(self, batch_size, is_distributed):
-        from ..Dataset.Imagenet import Imagenet_VID_Dataset,NAMES
-        
-        
-        transforms=self._get_resizer_normalization()
-        self.val_dataset = Imagenet_VID_Dataset(self.nntool_val_ann_dir,self.nntool_val_dat_dir,val=True,transform=transforms,COCO=self.COCO,Add_Background=self.Add_Background,seq_lenght=self.seq_lenght)
-        
-        if is_distributed:
-            batch_size = batch_size // dist.get_world_size()
-            sampler = torch.utils.data.distributed.DistributedSampler(
-                self.val_dataset, shuffle=False
-            )
-        else:
-            sampler = torch.utils.data.SequentialSampler(self.val_dataset)
-       
-        dataloader_kwargs = {
-            "num_workers": self.data_num_workers,
-            "pin_memory": False,
-            "sampler": sampler,
-        }
-        
-        dataloader_kwargs["batch_size"] = batch_size
-        self.nntool_val_loader = torch.utils.data.DataLoader(self.val_dataset,**dataloader_kwargs)
-
-        return self.nntool_val_loader
-
-
-    def get_evaluator(self,subcaption=1):
-        from detectron2.evaluation import COCOEvaluator
-        from detectron2.data import MetadataCatalog, DatasetCatalog
-        from ..Dataset.Imagenet import set_sub_captioning,DATASET_NAMES
-
-        if( hasattr(self,'val_loader')):
-            
-            NAMES=DATASET_NAMES[self.COCO]
-            NAMES= NAMES if self.Add_Background else NAMES[1:]
-            
-            DATASET_NAME=self.COCO+f'coco_image_net_{subcaption}'+(''if not self.Add_Background else '_with_background')
-
-            ds_image_net_val=set_sub_captioning(self.val_dat_dir,self.val_ann_dir,subcaption,COCO=self.COCO,Add_Background=self.Add_Background)
-            DatasetCatalog.register(DATASET_NAME,ds_image_net_val)	
-            MetadataCatalog.get(DATASET_NAME ).set(thing_classes=NAMES)
-            self.evaluator = COCOEvaluator(DATASET_NAME, output_dir="./output",use_fast_impl=False)
-        else:
-            logger.error("you cannot instanciate the evaluator without its corresponding dataloader")
-            raise Exception("Tried to create evaluator without evaluator dataloader")
-        return self.evaluator
-        
-    def get_nntool_evaluator(self,subcaption=1):
-        from detectron2.evaluation import COCOEvaluator
-        from detectron2.data import MetadataCatalog, DatasetCatalog
-        from ..Dataset.Imagenet import set_sub_captioning,DATASET_NAMES
-
-        if( hasattr(self,'nntool_val_loader')):
-            
-            NAMES=DATASET_NAMES[self.COCO]
-            NAMES= NAMES if self.Add_Background else NAMES[1:]
-            
-            DATASET_NAME=self.COCO+f'NNTOOL_coco_image_net_{subcaption}'+(''if not self.Add_Background else '_with_background')
-
-            ds_image_net_val=set_sub_captioning(self.nntool_val_dat_dir,self.nntool_val_ann_dir,subcaption,COCO=self.COCO,Add_Background=self.Add_Background)
-            DatasetCatalog.register(DATASET_NAME,ds_image_net_val)	
-            MetadataCatalog.get(DATASET_NAME ).set(thing_classes=NAMES)
-            self.evaluator = COCOEvaluator(DATASET_NAME, output_dir="./output",use_fast_impl=False)
-        else:
-            logger.error("you cannot instanciate the evaluator without its corresponding dataloader")
-            raise Exception("Tried to create evaluator without evaluator dataloader")
-
-
-        
-        return self.evaluator
-
     def get_trainer(self, args,val=False):
         __package__="NN_Train_test.Experiments.yolo_base"
         from ..Evaluator.Evaluator import Evaluator
@@ -431,38 +252,5 @@ class Exp(BaseExp):
 
 
 
-'''
-def random_resize(self, data_loader, epoch, rank, is_distributed):
-        tensor = torch.LongTensor(2).cuda()
-
-        if rank == 0:
-            size_factor = self.input_size[1] * 1.0 / self.input_size[0]
-            if not hasattr(self, 'random_size'):
-                min_size = int(self.input_size[0] / 32) - self.multiscale_range
-                max_size = int(self.input_size[0] / 32) + self.multiscale_range
-                self.random_size = (min_size, max_size)
-            size = random.randint(*self.random_size)
-            size = (int(32 * size), 32 * int(size * size_factor))
-            tensor[0] = size[0]
-            tensor[1] = size[1]
-
-        if is_distributed:
-            dist.barrier()
-            dist.broadcast(tensor, 0)
-
-        input_size = (tensor[0].item(), tensor[1].item())
-        return input_size
-
-    def preprocess(self, inputs, targets, tsize):
-        scale_y = tsize[0] / self.input_size[0]
-        scale_x = tsize[1] / self.input_size[1]
-        if scale_x != 1 or scale_y != 1:
-            inputs = nn.functional.interpolate(
-                inputs, size=tsize, mode="bilinear", align_corners=False
-            )
-            targets[..., 1::2] = targets[..., 1::2] * scale_x
-            targets[..., 2::2] = targets[..., 2::2] * scale_y
-        return inputs, targets
-'''
 
    

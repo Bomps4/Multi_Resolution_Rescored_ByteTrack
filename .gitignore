@@ -8,6 +8,6 @@
 ./Testing_library/Experiments/__pycache__
 ./Testing_library/My_transforms/__pycache__
 ./Testing_library/Dataset/__pycache__
-./Testing_library/Evaluator_outputs/*
+./Testing_library/Evaluator_outputs/**
 ./Testing_library/output
 ./Testing_library/__pycache__
