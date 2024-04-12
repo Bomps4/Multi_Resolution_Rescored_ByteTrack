@@ -1,4 +1,4 @@
-
+# Copyright (c) Megvii, Inc. and its affiliates.
 import torch
 from loguru import logger
 class DataPrefetcher(object):
