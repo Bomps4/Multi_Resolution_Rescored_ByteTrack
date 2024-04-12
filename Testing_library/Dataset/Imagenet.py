@@ -1,3 +1,4 @@
+#Copyright (C)  Bomps4 (luca.bompani5@unibo.it) 2023-2024 University of Bologna, Italy.
 from torch.utils.data import Dataset
 import xml.etree.ElementTree as ET
 import os
