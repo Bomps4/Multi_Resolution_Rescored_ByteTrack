@@ -1,3 +1,4 @@
+# Copyright (c) Megvii, Inc. and its affiliates.
 from torch import nn
 from ..network_blocks import Res_unit,ConvBnLeaky
 
