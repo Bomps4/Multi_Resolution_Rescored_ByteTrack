@@ -12,7 +12,7 @@ class Exp(My_Exp):
         self.width = 0.50
         self.archi_name = 'BYTES_YOLOXS'
         self.num_classes = 30
-        self.minimum_threshold=0.1
+        self.minimum_threshold=0.1 #minimum treshold to accept a bounding box if it can be linked to a previous active tracker
         self.input_size = (320, 320)
         self.test_size = (576, 576)
         self.reduced_size = (346, 346)
@@ -20,12 +20,12 @@ class Exp(My_Exp):
         self.rescoring=True
         self.normalize=False
         self.resize_as_tensor=False
-        self.xyxy=False
+        self.xyxy=False # define if the output of the network is in xyxy format of xywh format
         self.class_agnostic=True
         self.bgr=True
-        self.test_conf=0.4
+        self.test_conf=0.4 # minimum treshold to accept a bounding box without linking to a previous active tracker
         self.nmsthre=0.5
-        self.iou_threshold=0.3 #intersection between detection in multiple frames to 
+        self.iou_threshold=0.3 #intersection between detections in multiple frames 
         self.lenght_track=5  #number of frames for which a track remain active
         self.min_hits=2 #minimum number of associations before a track is followed.
         self.seq_lenght=-1 #meaning take the video full lenght
