@@ -20,3 +20,6 @@ To reproduce the experiment with MR2-ByteTrack and the YOLOXS network run the co
      python eval_multires.py -f=./BYTE_RESCORE/Experiments/BYTE_YOLOXS_multisize.py -c=path/to/the/yoloxs/weights
     ```
     the -f option indicates the experiment that you are running and -c is used for loading pretrained weights from checkpoint. For an explanation of all the parameters see the file yolo_base_multisize.py.
+
+### Acknowledgements
+This work received support from Swiss National Science Foundation Project 207913 "TinyTrainer: On-chip Training for TinyML devices"
