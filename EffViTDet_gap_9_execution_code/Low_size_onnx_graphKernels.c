@@ -32746,7 +32746,7 @@ int  Low_size_onnx_graphCNN_Construct(int first_time)
 		// printf("two \n");
 		AT_DEFAULTFLASH_FS_CONF_INIT(&DefaultFlashConf, AT_MEM_L3_DEFAULTFLASH, 0);
 		// printf("three \n");
-		AT_DEFAULTFLASH_FS_OPEN(&DefaultFlash, &DefaultFlashConf, 0, "Low_size_onnx_graph_L3_Flash_Const.dat", &Error);
+		AT_DEFAULTFLASH_FS_OPEN(&DefaultFlash, &DefaultFlashConf, 0, "onnx_graph_L3_Flash_Const.dat", &Error);
 		// printf("four \n");
 		if (Error) return AT_FLASH_OPEN_ERROR;
 	}
