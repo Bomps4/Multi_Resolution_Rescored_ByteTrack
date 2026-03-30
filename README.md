@@ -1,8 +1,7 @@
 #     Multi_Resolution_Rescored_ByteTrack
 
-The code in this repository is based on the code from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [YOLOV](https://github.com/YuHengsss/YOLOV/tree/master)and [ByteTrack](https://github.com/ifzhang/ByteTrack).\
-We are happy to announce that our paper [Multi-resolution Rescored ByteTrack for Video Object Detection on Ultra-low-power Embedded Systems]() has been accepted at the Embedded Vision Workshop at the CVPR conference.\
-In this repo the code to reproduce our results with MR2ByteTrack on the YOLOXS network. To do so you will need to:
+The code in this repository is based on the code from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [YOLOV](https://github.com/YuHengsss/YOLOV/tree/master) and [ByteTrack](https://github.com/ifzhang/ByteTrack).\
+In this repo the code to reproduce our results with MR2ByteTrack on the EffVIT-Det network. To do so you will need to:
 
 ![How MR2ByteTrack works](./images/MR2_ByteTrack.png)
 
@@ -16,9 +15,11 @@ In this repo the code to reproduce our results with MR2ByteTrack on the YOLOXS n
     - change ``` self.val_ann_dir``` with the path to the Annotation VID folder contained in the ILSVRC2015 VID dataset folder\
 To reproduce the experiment with MR2-ByteTrack and the YOLOXS network run the command:
     ```shell
-     python eval_multires.py -f=./Trainin_Library/Experiments/BYTE_Efficient_VIT_YOLOX_improved.py -c=path/to/the/yoloxs/weights
+     python eval_multires.py -f=./Trainin_Library/Experiments/BYTE_Efficient_VIT_YOLOX_improved.py -c=path/to/the/Efficient_VIT_YOLOX/weights
     ```
-    the -f option indicates the experiment that you are running and -c is used for loading pretrained weights from checkpoint. For an explanation of all the parameters see the file yolo_base_multisize.py.
+    the -f option indicates the experiment that you are running and -c is used for loading pretrained weights from checkpoint. For an explanation of all the parameters see the file yolo_base_multisize.py.  
 
-### Acknowledgements
-This work received support from Swiss National Science Foundation Project 207913 "TinyTrainer: On-chip Training for TinyML devices"
+we also provide the weights of EffVIT-Det trained on the COCO dataset in the file EffVIT-Det.pth.  
+
+Finally this repo also contains the C code for the deployment of the EffVIT-Det object detector in the folder EffViTDet_gap_9_execution_code
+
