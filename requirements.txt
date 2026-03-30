@@ -1,0 +1,40 @@
+# Core deep learning
+torch>=1.7.0,<2.0.0       # Python 3.8 compatible; 2.x drops 3.8 in later releases
+torchvision>=0.10.0,<0.15.0
+torchinfo>=1.7.0
+
+# Backbone — EfficientViT models require timm >=0.9.0; pin below 1.0 to keep Python 3.8 support
+timm>=0.9.0,<1.0.0
+
+# Vision / image processing
+opencv_python
+Pillow
+scikit-image
+
+# Data / numerics
+numpy
+h5py
+scikit-learn
+pandas
+
+# Training utilities
+tqdm
+loguru
+tabulate
+tensorboard
+thop
+ninja
+
+# Tracking (ByteTrack)
+lap
+motmetrics
+filterpy
+
+# Evaluation
+pycocotools>=2.0.2
+tidecv
+
+# ONNX export
+onnx==1.8.1
+onnxruntime==1.8.0
+onnx-simplifier==0.3.5
